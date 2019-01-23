@@ -28,6 +28,7 @@ class Parameter(tfe.Variable):
     def __init__(self, data: VariableData,
                  transform: Optional[Transform] = None,
                  prior: Optional[Prior] = None,
+		 control_variate: Optional[VariableData] = None,
                  trainable: bool = True,
                  dtype: np.dtype = None,
                  unconstrained: bool = False,
@@ -38,6 +39,12 @@ class Parameter(tfe.Variable):
         self.transform = transform
         self.prior = prior
         self.is_constrained = constrained
+
+        if control_variate is None:
+            self._control_variate = tf.zeros(self.shape)
+        else:
+            self._control_variate = _to_variable_data(control_variate)
+            assert self._control_variate.shape == self.shape, "Control variate must have the same shape as controlled parameter"
 
     @property
     def trainable(self) -> bool:
@@ -92,6 +99,15 @@ class Parameter(tfe.Variable):
     @trainable.setter
     def trainable(self, flag: Union[bool, int]):
         self._trainable = bool(flag)
+
+    @property
+    def control_variate(self):
+        return self._control_variate
+
+    @control_variate.setter
+    def control_variate(self, variate):
+        assert variate.shape == self.shape, "Control variate must have the same shape as controlled parameter"
+        self._control_variate = _to_variable_data(variate)
 
     def log_prior(self):
         x = self.constrained
