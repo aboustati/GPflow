@@ -26,7 +26,7 @@ requirements = [
     'tensorflow-probability'
 ]
 
-min_tf_version = '1.11.0'
+min_tf_version = '1.13.0rc2'
 tf_cpu = 'tensorflow>={}'.format(min_tf_version)
 tf_gpu = 'tensorflow-gpu>={}'.format(min_tf_version)
 
